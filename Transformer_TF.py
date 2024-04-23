@@ -42,3 +42,10 @@ class MultiHeadAttention(layers.Layer):
         output = tf.transpose(output, perm=[0, 2, 1, 3])
         concat_attention = tf.reshape(output, (batch_size, -1, self.d_model))
         return self.dense(concat_attention)
+
+def positional_encoding(position, d_model):
+        angle_rads = np.arange(position)[:, np.newaxis] / np.power(10000, (2 * (np.arange(d_model)[np.newaxis, :] // 2)) / np.float32(d_model))
+        angle_rads[:, 0::2] = np.sin(angle_rads[:, 0::2])
+        angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
+        pos_encoding = angle_rads[np.newaxis, ...]
+        return tf.cast(pos_encoding, dtype=tf.float32)
