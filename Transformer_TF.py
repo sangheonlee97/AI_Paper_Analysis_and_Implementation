@@ -44,11 +44,11 @@ class MultiHeadAttention(layers.Layer):
         return self.dense(concat_attention)
 
 def positional_encoding(position, d_model):
-        angle_rads = np.arange(position)[:, np.newaxis] / np.power(10000, (2 * (np.arange(d_model)[np.newaxis, :] // 2)) / np.float32(d_model))
-        angle_rads[:, 0::2] = np.sin(angle_rads[:, 0::2])
-        angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
-        pos_encoding = angle_rads[np.newaxis, ...]
-        return tf.cast(pos_encoding, dtype=tf.float32)
+    angle_rads = np.arange(position)[:, np.newaxis] / np.power(10000, (2 * (np.arange(d_model)[np.newaxis, :] // 2)) / np.float32(d_model))
+    angle_rads[:, 0::2] = np.sin(angle_rads[:, 0::2])
+    angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
+    pos_encoding = angle_rads[np.newaxis, ...]
+    return tf.cast(pos_encoding, dtype=tf.float32)
     
 def create_padding_mask(seq):
     seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
@@ -185,7 +185,8 @@ def transformer(vocab_size, num_layers, dff, d_model, num_heads, dropout, name="
     dec_outputs = decoder(vocab_size=vocab_size, num_layers=num_layers, dff=dff, d_model=d_model, num_heads=num_heads, dropout=dropout,)(inputs=[dec_inputs, enc_outputs, look_ahead_mask, dec_padding_mask])
 
     # 다음 단어 예측을 위한 출력층
-    outputs = tf.keras.layers.Dense(units=vocab_size, name="outputs")(dec_outputs)
+    # outputs = tf.keras.layers.Dense(units=vocab_size, activation='softmax', name="outputs")(dec_outputs)    # 단어 예측
+    outputs = tf.keras.layers.Dense(units=1, activation='sigmoid', name="outputs")(dec_outputs)    # 이진 분류
 
     return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
         

@@ -2,6 +2,7 @@ from keras.utils import pad_sequences
 from keras.datasets import imdb
 from sklearn.model_selection import train_test_split
 import Transformer_TF
+import tensorflow as tf
 
 # IMDb 데이터셋 로드
 max_features = 20000
@@ -36,6 +37,7 @@ transformer = Transformer_TF.transformer(
 # 모델 컴파일
 transformer.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
+print(transformer.summary())
 # 모델 학습
 history = transformer.fit(
     [X_train, X_train], y_train,
