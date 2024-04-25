@@ -2,6 +2,24 @@ from torch import nn
 import torch
 import math
 
+class TokenEmbedding(nn.Embedding):
+    def __init__(self, vocab_size, d_model):
+        super(TokenEmbedding, self).__init__(vocab_size, d_model, padding_idx=1)
+
+
+class TransformerEmbedding(nn.Module):
+    def __init__(self, vocab_size, d_model, max_len, drop_prob, device):
+        super(TransformerEmbedding, self).__init__()
+        self.tok_emb = TokenEmbedding(vocab_size, d_model)
+        self.pos_emb = PositionalEncoding(d_model, max_len, device)
+        self.drop_out = nn.Dropout(p=drop_prob)
+
+    def forward(self, x):
+        tok_emb = self.tok_emb(x)
+        pos_emb = self.pos_emb(x)
+        return self.drop_out(tok_emb + pos_emb)
+
+
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len, device):
         super(PositionalEncoding, self).__init__()
@@ -54,7 +72,6 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, q, k, v, mask=None):
         q, k, v = self.w_q(q), self.w_k(k), self.w_v(v)
-
         q, k, v = self.split(q), self.split(k), self.split(v)
 
         out, attention = self.attention(q, k, v, mask=mask)
@@ -136,3 +153,24 @@ class EncoderLayer(nn.Module):
 
         return x
 
+class Encoder(nn.Module):
+    def __init__(self, enc_voc_size, max_len, d_model, ffn_hidden, n_head, n_layers, drop_prob, device):
+        super().__init__()
+        self.emb = TransformerEmbedding(d_model=d_model,
+                                        max_len=max_len,
+                                        vocab_size=enc_voc_size,
+                                        drop_prob=drop_prob,
+                                        device=device)
+
+        self.layers = nn.ModuleList([EncoderLayer(d_model=d_model,
+                                     ffn_hidden=ffn_hidden,
+                                     n_head=n_head,
+                                     drop_prob=drop_prob) for _ in range(n_layers)])
+
+        def forward(self, x, src_mask):
+            x = self.emb(x)
+
+            for layer in self.layers:
+                x = layer(x, src_mask)
+
+            return x
