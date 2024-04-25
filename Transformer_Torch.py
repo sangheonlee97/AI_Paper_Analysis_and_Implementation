@@ -146,7 +146,7 @@ class EncoderLayer(nn.Module):
         x = self.dropout1(x)
         x = self.norm1(x + _x)
 
-        -x = x
+        _x = x
         x = self.ffn(x)
         x = self.dropout2(x)
         x = self.norm2(x + _x)
@@ -283,4 +283,3 @@ class Transformer(nn.Module):
         return trg_mask
 
 
-    
