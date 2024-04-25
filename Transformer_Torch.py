@@ -167,10 +167,48 @@ class Encoder(nn.Module):
                                      n_head=n_head,
                                      drop_prob=drop_prob) for _ in range(n_layers)])
 
-        def forward(self, x, src_mask):
-            x = self.emb(x)
+    def forward(self, x, src_mask):
+        x = self.emb(x)
 
-            for layer in self.layers:
-                x = layer(x, src_mask)
+        for layer in self.layers:
+            x = layer(x, src_mask)
 
-            return x
+        return x
+
+
+class DecoderLayer(nn.Module):
+    def __init__(self, d_model, ffn_hidden, n_head, drop_prob):
+        super(DecoderLayer, self).__init__()
+        self.self_attention = MultiHeadAttention(d_model=d_model, n_head=n_head)
+        self.norm1 = LayerNorm(d_model=d_model)
+        self.dropout1 = nn.Dropout(p=drop_prob)
+
+        self.enc_dec_attention = MultiHeadAttention(d_model=d_model, n_head=n_head)
+        self.norm2 = LayerNorm(d_model=d_model)
+        self.dropout2 = nn.Dropout(p=drop_prob)
+
+        self.ffn = PositionwiseFeedForward(d_model=d_model, hidden=ffn_hidden, drop_prob=drop_prob)
+        self.norm3 = LayerNorm(d_model=d_model)
+        self.dropout3 = nn.Dropout(p=drop_prob)
+
+    def forward(self, dec, enc, trg_mask, src_mask):
+        _x = dec
+        x = self.self_attention(q=dec, k=dec, v=dec, mask=trg_mask)
+        x = self.dropout1(x)
+        x = self.norm1(x + _x)
+
+        if enc is not None:
+            _x = x
+            x = self.enc_dec_attention(q=x, k=enc, v=enc, mask=src_mask)
+            x = self.dropout2(x)
+            x = self.norm2(x + _x)
+
+        _x = x
+        x = self.ffn(x)
+        x = self.dropout3(x)
+        x = self.norm3(x + _x)
+
+        return x
+
+
+    
