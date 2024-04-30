@@ -1,7 +1,7 @@
 from keras.utils import pad_sequences
 from keras.datasets import imdb
 from sklearn.model_selection import train_test_split
-import Transformer_TF
+import Transformer_TF_m
 import tensorflow as tf
 
 # IMDb 데이터셋 로드
@@ -25,7 +25,7 @@ num_heads = 8
 dropout = 0.1
 
 # 모델 생성
-transformer = Transformer_TF.transformer(
+transformer = Transformer_TF_m.transformer(
     vocab_size=vocab_size,
     num_layers=num_layers,
     dff=dff,
