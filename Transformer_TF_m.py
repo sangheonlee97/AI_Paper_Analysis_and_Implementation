@@ -370,8 +370,8 @@ urllib.request.urlretrieve("https://raw.githubusercontent.com/songys/Chatbot_dat
 train_data = pd.read_csv('ChatBotData.csv')
 train_data.head()
 
-print('챗봇 샘플의 개수 :', len(train_data))
-print(train_data.isnull().sum())
+# print('챗봇 샘플의 개수 :', len(train_data))
+# print(train_data.isnull().sum())
 
 questions = []
 for sentence in train_data['Q']:
@@ -390,8 +390,8 @@ for sentence in train_data['A']:
     sentence = sentence.strip()
     answers.append(sentence)
     
-print(questions[:5])
-print(answers[:5])
+# print(questions[:5])
+# print(answers[:5])
 
 
 # 서브워드텍스트인코더를 사용하여 질문과 답변을 모두 포함한 단어 집합(Vocabulary) 생성
@@ -405,12 +405,12 @@ START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 VOCAB_SIZE = tokenizer.vocab_size + 2
      
 
-print('시작 토큰 번호 :',START_TOKEN)
-print('종료 토큰 번호 :',END_TOKEN)
-print('단어 집합의 크기 :',VOCAB_SIZE)
+# print('시작 토큰 번호 :',START_TOKEN)
+# print('종료 토큰 번호 :',END_TOKEN)
+# print('단어 집합의 크기 :',VOCAB_SIZE)
 
 # 서브워드텍스트인코더 토크나이저의 .encode()를 사용하여 텍스트 시퀀스를 정수 시퀀스로 변환.
-print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
+# print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
 
 # 서브워드텍스트인코더 토크나이저의 .encode()와 decode() 테스트해보기
 
@@ -419,16 +419,16 @@ sample_string = questions[20]
 
 # encode() : 텍스트 시퀀스 --> 정수 시퀀스
 tokenized_string = tokenizer.encode(sample_string)
-print ('정수 인코딩 후의 문장 {}'.format(tokenized_string))
+# print ('정수 인코딩 후의 문장 {}'.format(tokenized_string))
 
 # decode() : 정수 시퀀스 --> 텍스트 시퀀스
 original_string = tokenizer.decode(tokenized_string)
-print ('기존 문장: {}'.format(original_string))
+# print ('기존 문장: {}'.format(original_string))
 
 # 각 정수는 각 단어와 어떻게 mapping되는지 병렬로 출력
 # 서브워드텍스트인코더는 의미있는 단위의 서브워드로 토크나이징한다. 띄어쓰기 단위 X 형태소 분석 단위 X
-for ts in tokenized_string:
-  print ('{} ----> {}'.format(ts, tokenizer.decode([ts])))
+# for ts in tokenized_string:
+#   print ('{} ----> {}'.format(ts, tokenizer.decode([ts])))
   
   
 # 최대 길이를 40으로 정의
@@ -457,16 +457,16 @@ def tokenize_and_filter(inputs, outputs):
 questions, answers = tokenize_and_filter(questions, answers)
 
 
-print('질문 데이터의 크기(shape) :', questions.shape)
-print('답변 데이터의 크기(shape) :', answers.shape)
+# print('질문 데이터의 크기(shape) :', questions.shape)
+# print('답변 데이터의 크기(shape) :', answers.shape)
      
      
 # 0번째 샘플을 임의로 출력
-print(questions[0])
-print(answers[0])
+# print(questions[0])
+# print(answers[0])
 
-print('단어 집합의 크기(Vocab size): {}'.format(VOCAB_SIZE))
-print('전체 샘플의 수(Number of samples): {}'.format(len(questions)))
+# print('단어 집합의 크기(Vocab size): {}'.format(VOCAB_SIZE))
+# print('전체 샘플의 수(Number of samples): {}'.format(len(questions)))
 
 # 텐서플로우 dataset을 이용하여 셔플(shuffle)을 수행하되, 배치 크기로 데이터를 묶는다.
 # 또한 이 과정에서 교사 강요(teacher forcing)을 사용하기 위해서 디코더의 입력과 실제값 시퀀스를 구성한다.
@@ -491,9 +491,9 @@ dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
      
 
 # 임의의 샘플에 대해서 [:, :-1]과 [:, 1:]이 어떤 의미를 가지는지 테스트해본다.
-print(answers[0]) # 기존 샘플
-print(answers[:1][:, :-1]) # 마지막 패딩 토큰 제거하면서 길이가 39가 된다.
-print(answers[:1][:, 1:]) # 맨 처음 토큰이 제거된다. 다시 말해 시작 토큰이 제거된다. 길이는 역시 39가 된다.
+# print(answers[0]) # 기존 샘플
+# print(answers[:1][:, :-1]) # 마지막 패딩 토큰 제거하면서 길이가 39가 된다.
+# print(answers[:1][:, 1:]) # 맨 처음 토큰이 제거된다. 다시 말해 시작 토큰이 제거된다. 길이는 역시 39가 된다.
 
 tf.keras.backend.clear_session()
 
@@ -527,7 +527,7 @@ def accuracy(y_true, y_pred):
 model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
      
 
-EPOCHS = 50
+EPOCHS = 100
 
 # model.fit(dataset, epochs=EPOCHS)
 # model.save_weights('w.h5')
@@ -589,3 +589,4 @@ while True:
 
     # 질문에 대한 답변 출력
     output = predict(question)
+    print("\n")
