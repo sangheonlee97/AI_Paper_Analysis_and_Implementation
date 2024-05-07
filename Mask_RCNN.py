@@ -81,3 +81,11 @@ class CarDataset(Dataset):
 
     def __len__(self):
         return self.image_ids.shape[0]
+    
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
+dir_train = "/content/drive/MyDrive/dataset/data/training_images"
+train_ds = CarDataset(box, dir_train)
+
+train_dl = DataLoader(train_ds, batch_size=8, shuffle=False, num_workers=2, collate_fn=collate_fn)
