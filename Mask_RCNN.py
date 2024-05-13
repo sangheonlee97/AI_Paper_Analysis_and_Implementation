@@ -109,3 +109,14 @@ def get_instance_segmentation_model(num_classes):
 
     return model
 
+# class 1 + background 1 = 2
+num_classes = 2
+
+model = get_instance_segmentation_model(num_classes)
+model.to(device)
+
+params = [p for p in model.parameters() if p.requires_grad]
+optimizer = torch.optim.Adam(params, lr=0.0005, weight_decay=0.0005)
+
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+
