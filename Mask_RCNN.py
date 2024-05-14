@@ -120,3 +120,26 @@ optimizer = torch.optim.Adam(params, lr=0.0005, weight_decay=0.0005)
 
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
+model.train()
+
+num_epochs = 10
+
+for epoch in range(num_epochs):
+    
+    for i, (images, targets) in enumerate(train_dl):
+      optimizer.zero_grad()
+      images = list(image.to(device) for image in images)
+      targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        
+      loss_dict = model(images, targets)
+
+      losses = sum(loss for loss in loss_dict.values())
+
+      losses.backward()
+      optimizer.step()
+
+      if (i+1) % 40 == 0:
+        print(f'Epoch {epoch+1} - Total: {losses:.4f}, Regression: {loss_dict["loss_box_reg"]:.4f}, Classifier: {loss_dict["loss_classifier"]:.4f}')
+
+    scheduler.step()
+    
