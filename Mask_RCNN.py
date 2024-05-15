@@ -143,3 +143,28 @@ for epoch in range(num_epochs):
 
     scheduler.step()
     
+threshold = 0.8
+images = cv2.imread("/content/drive/MyDrive/dataset/data/testing_images/vid_5_26640.jpg", cv2.IMREAD_COLOR)
+images = cv2.cvtColor(images, cv2.COLOR_BGR2RGB).astype(np.float32)
+images /= 255.0
+sample = images
+images = torch.tensor(images)
+images = images.permute(2,0,1)
+images = torch.unsqueeze(images, 0)
+images = images.to(device)
+model.eval()
+cpu_device = torch.device("cpu")
+
+preds = model(images)
+outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in preds]
+mask = outputs[0]['scores'] > threshold
+boxes = outputs[0]["boxes"][mask].detach().numpy().astype(np.int32)
+for box in boxes:
+    cv2.rectangle(sample,
+                  (box[0], box[1]),
+                  (box[2], box[3]),
+                  (220, 0, 0), 3)
+    
+plt.imshow(sample)
+plt.show()
+
