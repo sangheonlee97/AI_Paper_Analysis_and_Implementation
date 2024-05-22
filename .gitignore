@@ -1,1 +1,3 @@
 *.pyc
+/CIFAR10
+*.tar
